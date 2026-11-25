@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Practice 1200 Computer Science MCQs across 12 subjects.">
+  <title>Subjects | TechMCQ Hub</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="responsive.css">
+  <style>
+    .page-heading { padding: 55px 0 25px; text-align: center; }
+    .search-area { max-width: 550px; margin: 25px auto 35px; }
+    .search-area input, .filter-select {
+      width: 100%; padding: 14px; border-radius: 10px;
+      background: var(--surface); color: var(--text);
+      border: 1px solid var(--border); outline: none;
+    }
+    .filter-select { max-width: 220px; }
+    .filter-row { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-bottom:30px; }
+    .subject-card { display:block; }
+    .empty { text-align:center; padding:30px; color:var(--text-muted); }
+  </style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo">
+      <span class="logo-mark">&lt;/&gt;</span>
+      TechMCQ <span class="logo-accent">Hub</span>
+    </a>
+    <nav id="nav-links" class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="subjects.html" class="active">Subjects</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="index.html#features">Features</a>
+    </nav>
+    <div class="nav-actions">
+      <button id="theme-toggle" class="icon-btn">🌙</button>
+      <button id="menu-toggle" class="icon-btn menu-btn">☰</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="page-heading">
+    <p class="badge">1200 MCQs Available</p>
+    <h1 class="section-title">
+      Explore <span class="gradient-text">12 Subjects</span>
+    </h1>
+    <p class="section-sub">Choose your subject and improve your knowledge.</p>
+
+    <div class="search-area">
+      <input type="search" id="subject-search"
+        placeholder="Search subjects...">
+    </div>
+
+    <div class="filter-row">
+      <select id="difficulty" class="filter-select">
+        <option value="all">All Difficulty Levels</option>
+        <option value="Easy">Easy</option>
+        <option value="Medium">Medium</option>
+        <option value="Hard">Hard</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:10px">
+    <div id="subject-grid" class="grid subject-grid"></div>
+    <p id="empty-message" class="empty" hidden>
+      No subjects found.
+    </p>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>© <span id="year"></span> TechMCQ Hub.</p>
+    <a href="dashboard.html">Dashboard</a>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script src="subjects.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const grid = document.getElementById("subject-grid");
+  const search = document.getElementById("subject-search");
+  const difficulty = document.getElementById("difficulty");
+  const empty = document.getElementById("empty-message");
+
+  function render() {
+    const query = search.value.toLowerCase();
+
+    const filtered = SUBJECTS.filter(subject =>
+      subject.name.toLowerCase().includes(query) ||
+      subject.desc.toLowerCase().includes(query)
+    );
+
+    grid.innerHTML = filtered.map(subject => `
+      <a class="card subject-card"
+         href="quiz.html?subject=${encodeURIComponent(subject.id)}&difficulty=${difficulty.value}">
+        <div class="card-icon">${subject.icon}</div>
+        <h3>${subject.name}</h3>
+        <p>${subject.desc}</p>
+        <div class="card-meta">100 MCQs → Start Practice</div>
+      </a>
+    `).join("");
+
+    empty.hidden = filtered.length !== 0;
+  }
+
+  search.addEventListener("input", render);
+  difficulty.addEventListener("change", render);
+  render();
+});
+</script>
+
+</body>
+</html>

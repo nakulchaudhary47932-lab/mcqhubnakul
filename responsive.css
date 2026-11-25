@@ -1,0 +1,31 @@
+/* ===== TABLET ===== */
+@media (max-width: 992px) {
+  .subject-grid { grid-template-columns: repeat(3, 1fr); }
+  .feature-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== MOBILE NAV + LAYOUT ===== */
+@media (max-width: 768px) {
+  .menu-btn { display: inline-block; }
+
+  .nav-links {
+    position: absolute; top: 66px; left: 0; right: 0;
+    flex-direction: column; gap: 0;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+  }
+  .nav-links.open { max-height: 320px; }
+  .nav-links a { padding: 14px 20px; border-top: 1px solid var(--border); }
+
+  .hero { padding: 70px 0 50px; }
+  .stats { gap: 28px; margin-top: 44px; }
+  .section { padding: 56px 0; }
+  .subject-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== SMALL PHONES ===== */
+@media (max-width: 520px) {
+  .subject-grid, .feature-grid { grid-template-columns: 1fr; }
+  .hero-cta .btn { width: 100%; text-align: center; }
+  .footer-inner { flex-direction: column; text-align: center; }
+}

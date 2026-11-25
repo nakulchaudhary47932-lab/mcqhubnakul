@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | TechMCQ Hub</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="responsive.css">
+
+  <style>
+    .dashboard-heading { padding:50px 0 30px; }
+    .dashboard-grid {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:18px;
+      margin:25px 0;
+    }
+    .dashboard-card {
+      background:var(--surface);
+      border:1px solid var(--border);
+      padding:22px;
+      border-radius:16px;
+    }
+    .dashboard-card p { color:var(--text-muted); }
+    .dashboard-card h2 { font-size:2rem; margin-top:10px; }
+    .progress-track {
+      height:9px; background:var(--bg-alt);
+      border-radius:20px; overflow:hidden; margin-top:12px;
+    }
+    .progress-fill {
+      height:100%; background:var(--gradient);
+      border-radius:20px; width:0;
+    }
+    .activity { margin-top:30px; }
+    .activity-row {
+      display:flex; justify-content:space-between;
+      gap:12px; padding:16px 5px;
+      border-bottom:1px solid var(--border);
+      flex-wrap:wrap;
+    }
+    .empty { color:var(--text-muted); padding:20px 0; }
+    @media(max-width:768px) {
+      .dashboard-grid { grid-template-columns:repeat(2,1fr); }
+    }
+    @media(max-width:480px) {
+      .dashboard-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo">
+      <span class="logo-mark">&lt;/&gt;</span>
+      TechMCQ <span class="logo-accent">Hub</span>
+    </a>
+
+    <nav id="nav-links" class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="subjects.html">Subjects</a>
+      <a href="dashboard.html" class="active">Dashboard</a>
+      <a href="index.html#about">About</a>
+    </nav>
+
+    <div class="nav-actions">
+      <button id="theme-toggle" class="icon-btn">🌙</button>
+      <button id="menu-toggle" class="icon-btn menu-btn">☰</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="dashboard-heading">
+    <p class="badge">Your Learning Statistics</p>
+    <h1 class="section-title">
+      My <span class="gradient-text">Dashboard</span>
+    </h1>
+    <p class="section-sub">Track your learning and quiz performance.</p>
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="dashboard-card">
+      <p>Total Attempts</p>
+      <h2 id="total-attempts">0</h2>
+    </article>
+
+    <article class="dashboard-card">
+      <p>Correct Answers</p>
+      <h2 id="correct-answers">0</h2>
+    </article>
+
+    <article class="dashboard-card">
+      <p>Wrong Answers</p>
+      <h2 id="wrong-answers">0</h2>
+    </article>
+
+    <article class="dashboard-card">
+      <p>Accuracy</p>
+      <h2 id="accuracy">0%</h2>
+    </article>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Subject-wise Progress</h2>
+    <div id="subject-progress" class="grid"
+         style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:30px">
+    </div>
+  </section>
+
+  <section class="activity">
+    <h2 class="section-title">Recent Quiz Activity</h2>
+    <div id="recent-activity"></div>
+  </section>
+
+  <div style="text-align:center;margin:35px 0">
+    <a href="subjects.html" class="btn btn-primary">
+      Start New Quiz
+    </a>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>© <span id="year"></span> TechMCQ Hub.</p>
+    <a href="subjects.html">Practice More</a>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script src="dashboard.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Expected format: an array of quiz result objects.
+  const results = JSON.parse(
+    localStorage.getItem("techmcq_results") || "[]"
+  );
+
+  let total = 0;
+  let correct = 0;
+  let wrong = 0;
+
+  const progress = {};
+
+  results.forEach(result => {
+    const attempted = Number(result.total || 0);
+    const right = Number(result.correct || 0);
+
+    total += attempted;
+    correct += right;
+    wrong += Math.max(0, attempted - right);
+
+    const id = result.subject;
+    if (id) {
+      if (!progress[id]) progress[id] = { total:0, correct:0 };
+      progress[id].total += attempted;
+      progress[id].correct += right;
+    }
+  });
+
+  const accuracy = total
+    ? Math.round((correct / total) * 100)
+    : 0;
+
+  document.getElementById("total-attempts").textContent = total;
+  document.getElementById("correct-answers").textContent = correct;
+  document.getElementById("wrong-answers").textContent = wrong;
+  document.getElementById("accuracy").textContent = accuracy + "%";
+
+  const progressContainer =
+    document.getElementById("subject-progress");
+
+  progressContainer.innerHTML = SUBJECTS.map(subject => {
+    const data = progress[subject.id] || { total:0, correct:0 };
+    const percentage = data.total
+      ? Math.round(data.correct / data.total * 100)
+      : 0;
+
+    return `
+      <article class="dashboard-card">
+        <h3>${subject.icon} ${subject.name}</h3>
+        <p>${data.total} questions attempted</p>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:${percentage}%"></div>
+        </div>
+        <p style="margin-top:8px">${percentage}% accuracy</p>
+      </article>
+    `;
+  }).join("");
+
+  const activity = document.getElementById("recent-activity");
+
+  if (!results.length) {
+    activity.innerHTML =
+      '<p class="empty">No quiz attempts yet. Start practicing to see your progress!</p>';
+  } else {
+    activity.innerHTML = [...results].reverse().slice(0,10).map(result => {
+      const subject = SUBJECTS.find(s => s.id === result.subject);
+      const name = subject ? subject.name : "Unknown Subject";
+
+      return `
+        <div class="activity-row">
+          <strong>${name}</strong>
+          <span>${Number(result.correct || 0)} / ${Number(result.total || 0)} correct</span>
+          <span>${result.date ? new Date(result.date).toLocaleDateString() : "Date unavailable"}</span>
+        </div>
+      `;
+    }).join("");
+  }
+});
+</script>
+</body>
+</html>

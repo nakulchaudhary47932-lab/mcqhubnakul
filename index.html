@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TechMCQ Hub - practice 1,200 Computer Science MCQs across 12 subjects. Learn. Practice. Test. Improve.">
+  <title>TechMCQ Hub | Learn. Practice. Test. Improve.</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="responsive.css">
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="logo" aria-label="TechMCQ Hub home">
+        <span class="logo-mark">&lt;/&gt;</span> TechMCQ <span class="logo-accent">Hub</span>
+      </a>
+      <nav id="nav-links" class="nav-links" aria-label="Main navigation">
+        <a href="index.html" class="active">Home</a>
+        <a href="subjects.html">Subjects</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="#features">Features</a>
+        <a href="#about">About</a>
+      </nav>
+      <div class="nav-actions">
+        <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark and light mode">🌙</button>
+        <button id="menu-toggle" class="icon-btn menu-btn" aria-label="Open menu" aria-expanded="false">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+      <div class="container hero-inner">
+        <p class="badge">B.Tech CSE Practice Platform</p>
+        <h1>Learn. Practice. <span class="gradient-text">Test. Improve.</span></h1>
+        <p class="hero-sub">Sharpen your Computer Science skills with 1,200 carefully written MCQs across 12 core subjects, with timed tests, detailed explanations and progress tracking.</p>
+        <div class="hero-cta">
+          <a href="subjects.html" class="btn btn-primary">Start Practicing</a>
+          <a href="#subjects" class="btn btn-ghost">Browse Subjects</a>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><span class="stat-num" data-target="1200">0</span><span class="stat-plus">+</span><p>MCQs</p></div>
+          <div class="stat"><span class="stat-num" data-target="12">0</span><p>Subjects</p></div>
+          <div class="stat"><span class="stat-num" data-target="3">0</span><p>Difficulty Levels</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SUBJECTS ===== -->
+    <section id="subjects" class="section">
+      <div class="container">
+        <h2 class="section-title">12 Subjects. <span class="gradient-text">One Platform.</span></h2>
+        <p class="section-sub">Pick a subject and start a quiz in seconds.</p>
+        <div id="subject-grid" class="grid subject-grid"></div>
+        <noscript><p class="section-sub">Please enable JavaScript to see the subjects.</p></noscript>
+      </div>
+    </section>
+
+    <!-- ===== FEATURES ===== -->
+    <section id="features" class="section alt">
+      <div class="container">
+        <h2 class="section-title">Everything you need to <span class="gradient-text">practice smart</span></h2>
+        <div class="grid feature-grid">
+          <article class="card reveal"><div class="card-icon">⏱️</div><h3>Timed Tests</h3><p>Practice under exam conditions with a countdown timer.</p></article>
+          <article class="card reveal"><div class="card-icon">📝</div><h3>Detailed Explanations</h3><p>Understand why an answer is right, not just what it is.</p></article>
+          <article class="card reveal"><div class="card-icon">📊</div><h3>Progress Dashboard</h3><p>Track attempts, accuracy and subject-wise improvement.</p></article>
+          <article class="card reveal"><div class="card-icon">🔖</div><h3>Bookmarks</h3><p>Save tough questions and revisit them anytime.</p></article>
+          <article class="card reveal"><div class="card-icon">🎯</div><h3>Difficulty Filters</h3><p>Choose Easy, Medium or Hard questions.</p></article>
+          <article class="card reveal"><div class="card-icon">🔀</div><h3>Random &amp; Mock Tests</h3><p>Randomised questions and full mock tests across subjects.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ABOUT ===== -->
+    <section id="about" class="section">
+      <div class="container about">
+        <h2 class="section-title">About <span class="gradient-text">TechMCQ Hub</span></h2>
+        <p>TechMCQ Hub is a free, open-source MCQ practice platform built for B.Tech students. It runs entirely in your browser, so there is no sign-up, and your progress is stored privately on your own device.</p>
+        <p class="author">Built by <strong>Nakul Chaudhary</strong> &middot; B.Tech CSE (Data Science &amp; AI), Expected 2028</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>&copy; <span id="year"></span> TechMCQ Hub. Learn. Practice. Test. Improve.</p>
+      <nav aria-label="Footer navigation">
+        <a href="subjects.html">Subjects</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="#about">About</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

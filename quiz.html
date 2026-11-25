@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz | TechMCQ Hub</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="responsive.css">
+
+<style>
+.quiz-header {
+  padding:35px 0 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  flex-wrap:wrap;
+}
+.quiz-layout {
+  display:grid;
+  grid-template-columns:1fr 280px;
+  gap:22px;
+  padding-bottom:60px;
+}
+.quiz-panel,.sidebar-panel {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:25px;
+}
+.quiz-top {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:20px;
+}
+.timer {
+  font-size:1.1rem;
+  font-weight:800;
+  color:var(--purple);
+}
+.question-text {
+  font-size:1.3rem;
+  margin:25px 0;
+}
+.option {
+  display:block;
+  padding:15px;
+  margin:12px 0;
+  border:1px solid var(--border);
+  border-radius:12px;
+  cursor:pointer;
+  transition:.2s;
+}
+.option:hover {
+  background:var(--surface-hover);
+  border-color:var(--purple);
+}
+.option input {
+  margin-right:10px;
+}
+.option.selected {
+  border-color:var(--purple);
+  background:rgba(139,92,246,.13);
+}
+.quiz-actions {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:30px;
+  flex-wrap:wrap;
+}
+.palette {
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:9px;
+  margin-top:18px;
+}
+.palette button {
+  padding:10px 4px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--bg-alt);
+  color:var(--text);
+  cursor:pointer;
+}
+.palette button.current { border:2px solid var(--purple); }
+.palette button.answered { background:#256d50; color:white; }
+.palette button.marked { outline:2px solid #eab308; }
+.progress-track {
+  height:8px;
+  background:var(--bg-alt);
+  border-radius:20px;
+  overflow:hidden;
+  margin:15px 0;
+}
+.progress-fill {
+  height:100%;
+  background:var(--gradient);
+}
+#result-screen { display:none; padding-bottom:60px; }
+.result-card {
+  max-width:750px;
+  margin:auto;
+  padding:30px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:18px;
+}
+.result-stats {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin:25px 0;
+}
+.result-stats div {
+  background:var(--bg-alt);
+  padding:18px;
+  text-align:center;
+  border-radius:12px;
+}
+.review-item {
+  padding:18px 0;
+  border-bottom:1px solid var(--border);
+}
+.correct-text { color:#22c55e; }
+.wrong-text { color:#ef4444; }
+#loading { text-align:center;padding:50px; }
+@media(max-width:800px) {
+  .quiz-layout { grid-template-columns:1fr; }
+  .result-stats { grid-template-columns:1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<header class="navbar">
+<div class="container nav-inner">
+  <a href="index.html" class="logo">
+    <span class="logo-mark">&lt;/&gt;</span>
+    TechMCQ <span class="logo-accent">Hub</span>
+  </a>
+  <nav id="nav-links" class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="subjects.html">Subjects</a>
+    <a href="dashboard.html">Dashboard</a>
+  </nav>
+  <div class="nav-actions">
+    <button id="theme-toggle" class="icon-btn">🌙</button>
+    <button id="menu-toggle" class="icon-btn menu-btn">☰</button>
+  </div>
+</div>
+</header>
+
+<main class="container">
+
+<section id="loading">
+  <h2>Loading Quiz...</h2>
+  <p>Please wait.</p>
+</section>
+
+<section id="quiz-screen" style="display:none">
+
+<div class="quiz-header">
+  <div>
+    <p class="badge">TechMCQ Hub Practice Test</p>
+    <h1 id="subject-name">Subject Quiz</h1>
+  </div>
+  <div>
+    <span class="timer">⏱ <span id="timer">00:00</span></span>
+  </div>
+</div>
+
+<div class="quiz-layout">
+
+  <section class="quiz-panel">
+    <div class="quiz-top">
+      <strong id="question-count">Question 1</strong>
+      <span id="difficulty-label">Medium</span>
+    </div>
+
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+
+    <h2 class="question-text" id="question-text"></h2>
+
+    <div id="options"></div>
+
+    <div class="quiz-actions">
+      <button class="btn btn-ghost" id="previous-btn">Previous</button>
+      <button class="btn btn-ghost" id="mark-btn">☆ Mark</button>
+      <button class="btn btn-primary" id="next-btn">Next</button>
+    </div>
+  </section>
+
+  <aside class="sidebar-panel">
+    <h3>Question Palette</h3>
+    <p style="color:var(--text-muted);margin-top:8px">
+      Navigate between questions.
+    </p>
+
+    <div class="palette" id="palette"></div>
+
+    <div style="margin-top:25px">
+      <p>🟢 Answered</p>
+      <p>🟣 Current</p>
+      <p>🟡 Marked for review</p>
+    </div>
+
+    <hr style="margin:20px 0;border-color:var(--border)">
+
+    <p id="answered-count">Answered: 0</p>
+    <p id="remaining-count">Remaining: 0</p>
+
+    <button class="btn btn-primary"
+      style="width:100%;margin-top:25px"
+      id="submit-btn">
+      Submit Test
+    </button>
+  </aside>
+
+</div>
+</section>
+
+<section id="result-screen">
+  <div class="result-card">
+    <p class="badge">Test Completed</p>
+    <h1 class="section-title">
+      Your <span class="gradient-text">Quiz Result</span>
+    </h1>
+
+    <div class="result-stats">
+      <div>
+        <h2 id="score">0</h2>
+        <p>Score</p>
+      </div>
+      <div>
+        <h2 id="correct-count">0</h2>
+        <p>Correct</p>
+      </div>
+      <div>
+        <h2 id="wrong-count">0</h2>
+        <p>Wrong</p>
+      </div>
+    </div>
+
+    <h2 id="percentage">0% Accuracy</h2>
+    <div class="progress-track">
+      <div class="progress-fill" id="result-progress"></div>
+    </div>
+
+    <p id="result-message" style="margin:20px 0"></p>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin:25px 0">
+      <a href="subjects.html" class="btn btn-primary">Try Another Quiz</a>
+      <a href="dashboard.html" class="btn btn-ghost">View Dashboard</a>
+    </div>
+
+    <h2 style="margin-top:30px">Answer Review</h2>
+    <div id="answer-review"></div>
+  </div>
+</section>
+
+</main>
+
+<script src="app.js"></script>
+<script src="quiz.js"></script>
+
+
+<script>
+const params = new URLSearchParams(location.search);
+
+const subjectId = params.get("subject") || "c";
+const requestedDifficulty = params.get("difficulty") || "all";
+
+let questions = [];
+let currentIndex = 0;
+let answers = {};
+let marked = new Set();
+let seconds = 0;
+let timerInterval = null;
+let submitted = false;
+
+const $ = id => document.getElementById(id);
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[char]);
+}
+
+function shuffle(array) {
+  return [...array].sort(() => Math.random() - 0.5);
+}
+
+async function loadQuiz() {
+  try {
+    const subject = SUBJECTS.find(s => s.id === subjectId);
+
+    if (!subject) throw new Error("Subject not found.");
+
+    const response = await fetch(subject.file);
+
+    if (!response.ok) throw new Error("Could not load " + subject.file);
+
+    const data = await response.json();
+
+    if (!Array.isArray(data) || !data.length) {
+      throw new Error("No questions available.");
+    }
+
+    let filtered = requestedDifficulty.toLowerCase() === "all"
+      ? data
+      : data.filter(q =>
+          String(q.difficulty || "Medium").toLowerCase() ===
+          requestedDifficulty.toLowerCase()
+        );
+
+    if (!filtered.length) {
+      throw new Error("No questions found for this difficulty.");
+    }
+
+    const requestedCount = Number(params.get("count")) || 10;
+    const count = Math.min(
+      Math.max(requestedCount, 1),
+      100,
+      filtered.length
+    );
+
+    questions = shuffle(filtered).slice(0, count);
+
+    $("subject-name").textContent = subject.name;
+    $("difficulty-label").textContent =
+      requestedDifficulty === "all" ? "Mixed Difficulty" : requestedDifficulty;
+
+    $("loading").style.display = "none";
+    $("quiz-screen").style.display = "block";
+
+    renderPalette();
+    showQuestion();
+    startTimer();
+
+  } catch(error) {
+    $("loading").innerHTML =
+      `<h2>Unable to Load Quiz</h2>
+       <p>${escapeHTML(error.message)}</p>
+       <p>Check your JSON files and folder structure.</p>
+       <a class="btn btn-primary" href="subjects.html">Back to Subjects</a>`;
+  }
+}
+
+function showQuestion() {
+  const q = questions[currentIndex];
+
+  $("question-count").textContent =
+    `Question ${currentIndex + 1} of ${questions.length}`;
+
+  $("question-text").textContent = q.question;
+
+  $("progress-fill").style.width =
+    ((currentIndex + 1) / questions.length * 100) + "%";
+
+  const options = Array.isArray(q.options) ? q.options : [];
+
+  $("options").innerHTML = options.map((option,index) => {
+    const selected = answers[currentIndex] === index;
+
+    return `
+      <label class="option ${selected ? "selected" : ""}">
+        <input type="radio" name="answer"
+          value="${index}" ${selected ? "checked" : ""}>
+        ${escapeHTML(option)}
+      </label>
+    `;
+  }).join("");
+
+  $("options").querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      answers[currentIndex] = Number(input.value);
+      showQuestion();
+    });
+  });
+
+  $("previous-btn").disabled = currentIndex === 0;
+  $("next-btn").textContent =
+    currentIndex === questions.length - 1 ? "Last Question" : "Next";
+
+  $("mark-btn").textContent =
+    marked.has(currentIndex) ? "★ Marked" : "☆ Mark";
+
+  updatePalette();
+}
+
+function renderPalette() {
+  $("palette").innerHTML = questions.map((q,index) =>
+    `<button type="button" data-index="${index}">${index+1}</button>`
+  ).join("");
+
+  $("palette").querySelectorAll("button").forEach(button => {
+    button.addEventListener("click", () => {
+      currentIndex = Number(button.dataset.index);
+      showQuestion();
+    });
+  });
+
+  updatePalette();
+}
+
+function updatePalette() {
+  $("palette").querySelectorAll("button").forEach((button,index) => {
+    button.classList.toggle("current",index === currentIndex);
+    button.classList.toggle("answered",answers[index] !== undefined);
+    button.classList.toggle("marked",marked.has(index));
+  });
+
+  const answered = Object.keys(answers).length;
+
+  $("answered-count").textContent = "Answered: " + answered;
+  $("remaining-count").textContent =
+    "Remaining: " + (questions.length - answered);
+}
+
+function startTimer() {
+  const duration = questions.length * 60;
+  seconds = duration;
+
+  timerInterval = setInterval(() => {
+    seconds--;
+
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+
+    $("timer").textContent =
+      String(min).padStart(2,"0") + ":" +
+      String(sec).padStart(2,"0");
+
+    if (seconds <= 0) submitQuiz();
+  },1000);
+}
+
+function submitQuiz() {
+  if (submitted) return;
+
+  const unanswered = questions.length - Object.keys(answers).length;
+
+  if (unanswered > 0 &&
+      seconds > 0 &&
+      !confirm(`${unanswered} questions are unanswered. Submit anyway?`)) {
+    return;
+  }
+
+  submitted = true;
+  clearInterval(timerInterval);
+
+  let correct = 0;
+
+  const review = questions.map((q,index) => {
+    const selected = answers[index];
+    const isCorrect = selected !== undefined &&
+      selected === Number(q.answer);
+
+    if (isCorrect) correct++;
+
+    return `
+      <div class="review-item">
+        <h3>Q${index+1}. ${escapeHTML(q.question)}</h3>
+        <p class="${isCorrect ? "correct-text" : "wrong-text"}">
+          Your answer: ${selected === undefined
+            ? "Not attempted"
+            : escapeHTML(q.options[selected])}
+        </p>
+        <p class="correct-text">
+          Correct answer: ${escapeHTML(q.options[Number(q.answer)])}
+        </p>
+        <p style="color:var(--text-muted);margin-top:8px">
+          ${escapeHTML(q.explanation || "No explanation provided.")}
+        </p>
+      </div>
+    `;
+  }).join("");
+
+  const wrong = questions.length - correct;
+  const percentage = Math.round(correct / questions.length * 100);
+
+  $("quiz-screen").style.display = "none";
+  $("result-screen").style.display = "block";
+
+  $("score").textContent = `${correct}/${questions.length}`;
+  $("correct-count").textContent = correct;
+  $("wrong-count").textContent = wrong;
+  $("percentage").textContent = percentage + "% Accuracy";
+  $("result-progress").style.width = percentage + "%";
+
+  $("result-message").textContent =
+    percentage >= 80 ? "Excellent work! Keep it up! 🎉" :
+    percentage >= 50 ? "Good effort! Keep practicing! 💪" :
+    "Keep learning. Practice makes progress! 📚";
+
+  $("answer-review").innerHTML = review;
+
+  saveResult(correct,wrong);
+}
+
+function saveResult(correct,wrong) {
+  try {
+    const results = JSON.parse(
+      localStorage.getItem("techmcq_results") || "[]"
+    );
+
+    results.push({
+      subject: subjectId,
+      total: questions.length,
+      correct: correct,
+      wrong: wrong,
+      date: new Date().toISOString()
+    });
+
+    localStorage.setItem(
+      "techmcq_results",
+      JSON.stringify(results)
+    );
+  } catch(error) {
+    console.error("Could not save result:",error);
+  }
+}
+
+$("previous-btn").addEventListener("click",() => {
+  if (currentIndex > 0) {
+    currentIndex--;
+    showQuestion();
+  }
+});
+
+$("next-btn").addEventListener("click",() => {
+  if (currentIndex < questions.length - 1) {
+    currentIndex++;
+    showQuestion();
+  }
+});
+
+$("mark-btn").addEventListener("click",() => {
+  if (marked.has(currentIndex)) marked.delete(currentIndex);
+  else marked.add(currentIndex);
+  showQuestion();
+});
+
+$("submit-btn").addEventListener("click",submitQuiz);
+
+loadQuiz();
+</script>
+
+</body>
+</html>
